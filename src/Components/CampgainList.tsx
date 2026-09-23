@@ -1,4 +1,4 @@
-import { Table, Tag } from 'antd';
+import { DatePicker, Input, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import { useEffect, useState } from 'react';
 
@@ -10,6 +10,8 @@ interface DataType {
     active: boolean;
     budget: number;
 }
+const { RangePicker } = DatePicker;
+const { Search } = Input;
 const columns: TableProps<DataType>['columns'] = [
     {
         title: 'ID',
@@ -61,14 +63,20 @@ function CampgainList() {
             .then(data => setCampaignList(data))
             .catch(error => console.error('Error fetching campaign data:', error));
     }, []);
+
+
     return (
-        <Table<DataType>
-            style={{ width: '70%', margin: '0 auto' }}
-            className='w-1/2'
-            columns={columns}
-            dataSource={campaignList}
-            rowKey={(record) => record.id.toString()}
-        />
+        <>
+            <div className='flex justify-between items-center my-8'>
+                <RangePicker placement='bottomLeft' />
+                <Search style={{ width: '300px' }} size="medium" placeholder="Search By Name" allowClear />
+            </div>
+            <Table<DataType>
+                columns={columns}
+                dataSource={campaignList}
+                rowKey={(record) => record.id.toString()}
+            />
+        </>
     )
 }
 
