@@ -1,7 +1,8 @@
-import { DatePicker, Input, Table, Tag } from 'antd';
+import { Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import { useEffect, useState } from 'react';
-
+import dayjs, { Dayjs } from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 interface DataType {
     id: number;
     name: string;
@@ -10,8 +11,10 @@ interface DataType {
     active: boolean;
     budget: number;
 }
-const { RangePicker } = DatePicker;
-const { Search } = Input;
+interface IPropType {
+    dateRange: [Dayjs | null, Dayjs | null] | null,
+    searchText: string
+}
 const columns: TableProps<DataType>['columns'] = [
     {
         title: 'ID',
@@ -51,12 +54,13 @@ const columns: TableProps<DataType>['columns'] = [
             </Tag>
         )
     }
-];
+]
 
+dayjs.extend(customParseFormat);
 
-
-function CampgainList() {
+function CampgainList({ dateRange, searchText }: IPropType) {
     const [campaignList, setCampaignList] = useState<DataType[]>([]);
+
     useEffect(() => {
         fetch('http://localhost:3000/campaigns')
             .then(response => response.json())
@@ -65,15 +69,20 @@ function CampgainList() {
     }, []);
 
 
+    const filteredData = campaignList.filter((campaign) => campaign.name.toLowerCase().includes(searchText.toLowerCase())).filter((campaign) => {
+        if (!dateRange) return true;
+        const [startDate, endDate] = dateRange;
+        const campgainStartDate = dayjs(campaign.startDate, "DD/MM/YYYY")
+        const campgainEndDate = dayjs(campaign.endDate, "DD/MM/YYYY")
+
+        return (campgainStartDate.isAfter(startDate) || campgainStartDate.isSame(startDate)) && (campgainEndDate.isSame(endDate) || campgainEndDate.isBefore(endDate));
+    });
     return (
         <>
-            <div className='flex justify-between items-center my-8'>
-                <RangePicker placement='bottomLeft' />
-                <Search style={{ width: '300px' }} size="medium" placeholder="Search By Name" allowClear />
-            </div>
+
             <Table<DataType>
                 columns={columns}
-                dataSource={campaignList}
+                dataSource={filteredData}
                 rowKey={(record) => record.id.toString()}
             />
         </>
