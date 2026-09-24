@@ -1,6 +1,5 @@
 import { Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
-import { useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import type { Campaign } from '../types';
@@ -50,7 +49,16 @@ const columns: TableProps<Campaign>['columns'] = [
                 {active ? 'Active' : 'Inactive'}
             </Tag>
         )
-    }
+    },
+    {
+        title: 'Budget',
+        dataIndex: 'budget',
+        key: 'budget',
+        render: (_, record) => `${new Intl.NumberFormat('en-US', {
+            notation: 'compact',
+            maximumFractionDigits: 1,
+        }).format(record.budget)} ${record.currency}`,
+    },
 ]
 
 dayjs.extend(customParseFormat);
