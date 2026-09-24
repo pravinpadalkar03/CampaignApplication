@@ -3,19 +3,14 @@ import type { TableProps } from 'antd';
 import { useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-interface DataType {
-    id: number;
-    name: string;
-    startDate: Date;
-    endDate: Date;
-    active: boolean;
-    budget: number;
-}
+import type { Campaign } from '../types';
+import { useGetCampaignQuery } from '../store/apiSlice';
+
 interface IPropType {
     dateRange: [Dayjs | null, Dayjs | null] | null,
     searchText: string
 }
-const columns: TableProps<DataType>['columns'] = [
+const columns: TableProps<Campaign>['columns'] = [
     {
         title: 'ID',
         dataIndex: 'id',
@@ -61,15 +56,13 @@ const columns: TableProps<DataType>['columns'] = [
 dayjs.extend(customParseFormat);
 
 function CampgainList({ dateRange, searchText }: IPropType) {
-    const [campaignList, setCampaignList] = useState<DataType[]>([]);
-
-    useEffect(() => {
-        fetch('http://localhost:3000/campaigns')
-            .then(response => response.json())
-            .then(data => setCampaignList(data))
-            .catch(error => console.error('Error fetching campaign data:', error));
-    }, []);
-
+    const { data: campaignList = [], isLoading, } = useGetCampaignQuery();
+    // useEffect(() => {
+    //     fetch('http://localhost:3000/campaigns')
+    //         .then(response => response.json())
+    //         .then(data => setCampaignList(data))
+    //         .catch(error => console.error('Error fetching campaign data:', error));
+    // }, []);
 
     const filteredData = campaignList.filter((campaign) => campaign.name.toLowerCase().includes(searchText.toLowerCase())).filter((campaign) => {
         if (!dateRange) return true;
@@ -82,11 +75,11 @@ function CampgainList({ dateRange, searchText }: IPropType) {
     return (
         <>
 
-            <Table<DataType>
+            <Table<Campaign>
                 columns={columns}
                 dataSource={filteredData}
                 rowKey={(record) => record.id.toString()}
-
+                loading={isLoading}
             />
         </>
     )
