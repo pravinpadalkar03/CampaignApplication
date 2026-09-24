@@ -37,11 +37,13 @@ const columns: TableProps<DataType>['columns'] = [
         title: 'Start Date',
         dataIndex: 'startDate',
         key: 'startDate',
+        sorter: (a, b) => dayjs(a.startDate, "DD/MM/YYYY").unix() - dayjs(b.startDate, "DD/MM/YYYY").unix()
     },
     {
         title: 'End Date',
         dataIndex: 'endDate',
         key: 'endDate',
+        sorter: (a, b) => dayjs(a.endDate, "DD/MM/YYYY").unix() - dayjs(b.endDate, "DD/MM/YYYY").unix()
     },
     {
         title: 'Active',
@@ -84,6 +86,7 @@ function CampgainList({ dateRange, searchText }: IPropType) {
                 columns={columns}
                 dataSource={filteredData}
                 rowKey={(record) => record.id.toString()}
+
             />
         </>
     )
