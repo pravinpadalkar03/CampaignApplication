@@ -69,7 +69,7 @@ dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 function CampgainList({ dateRange, searchText }: IPropType) {
-    const { data: campaignList = [], isLoading, } = useGetCampaignQuery();
+    const { data: campaignList = [], isLoading, isError, error } = useGetCampaignQuery();
     // useEffect(() => {
     //     fetch('http://localhost:3000/campaigns')
     //         .then(response => response.json())
@@ -95,13 +95,14 @@ function CampgainList({ dateRange, searchText }: IPropType) {
     });
     return (
         <>
-
-            <Table<Campaign>
-                columns={columns}
-                dataSource={filteredData}
-                rowKey={(record) => record.id.toString()}
-                loading={isLoading}
-            />
+            {isError ? <div>Error fetching campaign data</div> :
+                <Table<Campaign>
+                    columns={columns}
+                    dataSource={filteredData}
+                    rowKey={(record) => record.id.toString()}
+                    loading={isLoading}
+                />
+            }
         </>
     )
 }
