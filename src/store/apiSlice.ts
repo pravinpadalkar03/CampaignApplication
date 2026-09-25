@@ -5,8 +5,6 @@ import type { Campaign } from "../types";
 const baseUrl = "http://localhost:3000";
 export const api = createApi({
     reducerPath: 'campaignApi',
-
-
     baseQuery: fetchBaseQuery({ baseUrl }),
 
     endpoints: (builder) => ({

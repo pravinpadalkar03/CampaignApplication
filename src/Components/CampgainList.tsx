@@ -4,6 +4,8 @@ import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import type { Campaign } from '../types';
 import { useGetCampaignQuery } from '../store/apiSlice';
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
 interface IPropType {
     dateRange: [Dayjs | null, Dayjs | null] | null,
@@ -48,7 +50,8 @@ const columns: TableProps<Campaign>['columns'] = [
             <Tag color={active ? 'green' : 'red'}>
                 {active ? 'Active' : 'Inactive'}
             </Tag>
-        )
+        ),
+        align: 'center'
     },
     {
         title: 'Budget',
@@ -58,11 +61,13 @@ const columns: TableProps<Campaign>['columns'] = [
             notation: 'compact',
             maximumFractionDigits: 1,
         }).format(record.budget)} ${record.currency}`,
+        align: 'center'
     },
 ]
 
 dayjs.extend(customParseFormat);
-
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 function CampgainList({ dateRange, searchText }: IPropType) {
     const { data: campaignList = [], isLoading, } = useGetCampaignQuery();
     // useEffect(() => {
@@ -75,10 +80,18 @@ function CampgainList({ dateRange, searchText }: IPropType) {
     const filteredData = campaignList.filter((campaign) => campaign.name.toLowerCase().includes(searchText.toLowerCase())).filter((campaign) => {
         if (!dateRange) return true;
         const [startDate, endDate] = dateRange;
-        const campgainStartDate = dayjs(campaign.startDate, "DD/MM/YYYY")
-        const campgainEndDate = dayjs(campaign.endDate, "DD/MM/YYYY")
-
-        return (campgainStartDate.isAfter(startDate) || campgainStartDate.isSame(startDate)) && (campgainEndDate.isSame(endDate) || campgainEndDate.isBefore(endDate));
+        const campaignStartDate = dayjs(campaign.startDate, "DD/MM/YYYY")
+        const campaignEndDate = dayjs(campaign.endDate, "DD/MM/YYYY")
+        // console.log({
+        //     1: campgainStartDate.isAfter(startDate),
+        //     2: campgainStartDate.isSame(startDate),
+        //     3: campgainEndDate.isSame(endDate),
+        //     4: campgainEndDate.isBefore(endDate)
+        // })
+        return (
+            campaignStartDate.isSameOrBefore(endDate, "day") &&
+            campaignEndDate.isSameOrAfter(startDate, "day")
+        );
     });
     return (
         <>
