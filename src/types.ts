@@ -5,4 +5,5 @@ export interface Campaign {
     endDate: string;
     active: boolean;
     budget: number;
+    currency: string
 }
