@@ -76,8 +76,8 @@ function CampgainList() {
         const campaignStartDate = dayjs(campaign.startDate, "DD/MM/YYYY")
         const campaignEndDate = dayjs(campaign.endDate, "DD/MM/YYYY")
         return (
-            campaignStartDate.isSameOrBefore(dayjs(endDate, "DD/MM/YYYY"), "day") &&
-            campaignEndDate.isSameOrAfter(dayjs(startDate, "DD/MM/YYYY"), "day")
+            campaignStartDate.isSameOrBefore(dayjs(endDate, "YYYY-MM-DD"), "day") &&
+            campaignEndDate.isSameOrAfter(dayjs(startDate, "YYYY-MM-DD"), "day")
         );
     });
 
