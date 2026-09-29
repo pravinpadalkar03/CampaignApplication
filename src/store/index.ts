@@ -22,3 +22,4 @@ export const store = configureStore({
 })
 
 export const { dispatch, getState } = store
+export type RootState = ReturnType<typeof getState>

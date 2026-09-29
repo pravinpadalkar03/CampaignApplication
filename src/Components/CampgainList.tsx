@@ -6,11 +6,8 @@ import type { Campaign } from '../types';
 import { useGetCampaignQuery } from '../store/apiSlice';
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-
-interface IPropType {
-    dateRange: [Dayjs | null, Dayjs | null] | null,
-    searchText: string
-}
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store';
 const columns: TableProps<Campaign>['columns'] = [
     {
         title: 'ID',
@@ -68,26 +65,16 @@ const columns: TableProps<Campaign>['columns'] = [
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
-function CampgainList({ dateRange, searchText }: IPropType) {
+function CampgainList() {
+    const searchText = useSelector((state: RootState) => state.campaignFilter.searchText)
+    const dateRange = useSelector((state: RootState) => state.campaignFilter.dateRange)
     const { data: campaignList = [], isLoading, isError, error } = useGetCampaignQuery();
-    // useEffect(() => {
-    //     fetch('http://localhost:3000/campaigns')
-    //         .then(response => response.json())
-    //         .then(data => setCampaignList(data))
-    //         .catch(error => console.error('Error fetching campaign data:', error));
-    // }, []);
 
     const filteredData = campaignList.filter((campaign) => campaign.name.toLowerCase().includes(searchText.toLowerCase())).filter((campaign) => {
         if (!dateRange) return true;
         const [startDate, endDate] = dateRange;
         const campaignStartDate = dayjs(campaign.startDate, "DD/MM/YYYY")
         const campaignEndDate = dayjs(campaign.endDate, "DD/MM/YYYY")
-        // console.log({
-        //     1: campgainStartDate.isAfter(startDate),
-        //     2: campgainStartDate.isSame(startDate),
-        //     3: campgainEndDate.isSame(endDate),
-        //     4: campgainEndDate.isBefore(endDate)
-        // })
         return (
             campaignStartDate.isSameOrBefore(dayjs(endDate, "DD/MM/YYYY"), "day") &&
             campaignEndDate.isSameOrAfter(dayjs(startDate, "DD/MM/YYYY"), "day")
