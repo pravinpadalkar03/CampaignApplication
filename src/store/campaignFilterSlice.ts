@@ -7,7 +7,7 @@ const initialState: ICampaignFilterState = {
     dateRange: null
 }
 const campaignFilterSlice = createSlice({
-    name: "filter",
+    name: "campaignFilter",
     initialState: initialState,
     reducers: {
         setSearchText(state, action: PayloadAction<string>) {

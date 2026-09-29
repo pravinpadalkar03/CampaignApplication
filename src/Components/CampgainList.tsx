@@ -89,10 +89,11 @@ function CampgainList({ dateRange, searchText }: IPropType) {
         //     4: campgainEndDate.isBefore(endDate)
         // })
         return (
-            campaignStartDate.isSameOrBefore(endDate, "day") &&
-            campaignEndDate.isSameOrAfter(startDate, "day")
+            campaignStartDate.isSameOrBefore(dayjs(endDate, "DD/MM/YYYY"), "day") &&
+            campaignEndDate.isSameOrAfter(dayjs(startDate, "DD/MM/YYYY"), "day")
         );
     });
+
     return (
         <>
             {isError ? <div>Error fetching campaign data</div> :

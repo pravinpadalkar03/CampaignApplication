@@ -5,11 +5,11 @@ import CampgainList from "../Components/CampgainList"
 
 
 function CampaignPage() {
-    const [searchText, setSearchText] = useState<string>('');
-    const [dateRange, setDateRange] = useState<[Dayjs | null, null | Dayjs] | null>(null);
+    const [searchText] = useState<string>('');
+    const [dateRange] = useState<[Dayjs | null, null | Dayjs] | null>(null);
     return (
         <>
-            <CampaignFilters setDateRange={setDateRange} setSearchText={setSearchText} />
+            <CampaignFilters />
             <CampgainList dateRange={dateRange} searchText={searchText} />
         </>
     )

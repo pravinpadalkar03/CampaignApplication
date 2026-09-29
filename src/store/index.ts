@@ -18,5 +18,7 @@ export const store = configureStore({
         [api.reducerPath]: api.reducer,
         campaignFilter: campaignFilterReducer
     },
-    middleware: (getDefaultMiddleWares) => getDefaultMiddleWares().concat(logger).concat(api.middleware)
+    middleware: (getDefaultMiddleWares) => getDefaultMiddleWares().concat(logger).concat(api.middleware),
 })
+
+export const { dispatch, getState } = store

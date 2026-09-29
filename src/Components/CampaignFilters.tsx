@@ -1,24 +1,23 @@
 import { DatePicker, Input } from 'antd';
 import type { RangePickerProps } from 'antd/es/date-picker';
-import type { Dayjs } from 'dayjs';
+import { setDateRange, setSearchText } from '../store/campaignFilterSlice';
+import { dispatch } from '../store';
 
-type IPropType = {
-    setSearchText: React.Dispatch<React.SetStateAction<string>>,
-    setDateRange: React.Dispatch<React.SetStateAction<[Dayjs | null, Dayjs | null] | null>>
-}
-function CampaignFilters({ setDateRange, setSearchText }: IPropType) {
+
+function CampaignFilters() {
     const { RangePicker } = DatePicker;
     const { Search } = Input;
+    // const dispatch = useDispatch()
 
-    const handleDateRangeChange: RangePickerProps['onChange'] = (dates, dateStrings) => {
-        setDateRange(dates);
+    const handleDateRangeChange: RangePickerProps['onChange'] = (_, dateStrings) => {
+        dispatch(setDateRange(dateStrings ? [dateStrings[0] || null, dateStrings[1] || null] : null));
         console.log(dateStrings)
     }
 
     return (
         <div className='flex justify-between items-center my-8'>
             <RangePicker placement='bottomLeft' onChange={handleDateRangeChange} />
-            <Search style={{ width: '300px' }} size="medium" placeholder="Search By Name" onChange={(e) => setSearchText(e.target.value)} allowClear />
+            <Search style={{ width: '300px' }} size="medium" placeholder="Search By Name" onChange={(e) => dispatch(setSearchText(e.target.value))} allowClear />
         </div>
     )
 }
