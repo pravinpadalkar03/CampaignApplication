@@ -1,21 +1,14 @@
 import { Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
-import { useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-interface DataType {
-    id: number;
-    name: string;
-    startDate: Date;
-    endDate: Date;
-    active: boolean;
-    budget: number;
-}
-interface IPropType {
-    dateRange: [Dayjs | null, Dayjs | null] | null,
-    searchText: string
-}
-const columns: TableProps<DataType>['columns'] = [
+import type { Campaign } from '../types';
+import { useGetCampaignQuery } from '../store/apiSlice';
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store';
+const columns: TableProps<Campaign>['columns'] = [
     {
         title: 'ID',
         dataIndex: 'id',
@@ -37,11 +30,13 @@ const columns: TableProps<DataType>['columns'] = [
         title: 'Start Date',
         dataIndex: 'startDate',
         key: 'startDate',
+        sorter: (a, b) => dayjs(a.startDate, "DD/MM/YYYY").unix() - dayjs(b.startDate, "DD/MM/YYYY").unix()
     },
     {
         title: 'End Date',
         dataIndex: 'endDate',
         key: 'endDate',
+        sorter: (a, b) => dayjs(a.endDate, "DD/MM/YYYY").unix() - dayjs(b.endDate, "DD/MM/YYYY").unix()
     },
     {
         title: 'Active',
@@ -52,39 +47,50 @@ const columns: TableProps<DataType>['columns'] = [
             <Tag color={active ? 'green' : 'red'}>
                 {active ? 'Active' : 'Inactive'}
             </Tag>
-        )
-    }
+        ),
+        align: 'center'
+    },
+    {
+        title: 'Budget',
+        dataIndex: 'budget',
+        key: 'budget',
+        render: (_, record) => `${new Intl.NumberFormat('en-US', {
+            notation: 'compact',
+            maximumFractionDigits: 1,
+        }).format(record.budget)} ${record.currency}`,
+        align: 'center'
+    },
 ]
 
 dayjs.extend(customParseFormat);
-
-function CampgainList({ dateRange, searchText }: IPropType) {
-    const [campaignList, setCampaignList] = useState<DataType[]>([]);
-
-    useEffect(() => {
-        fetch('http://localhost:3000/campaigns')
-            .then(response => response.json())
-            .then(data => setCampaignList(data))
-            .catch(error => console.error('Error fetching campaign data:', error));
-    }, []);
-
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
+function CampgainList() {
+    const searchText = useSelector((state: RootState) => state.campaignFilter.searchText)
+    const dateRange = useSelector((state: RootState) => state.campaignFilter.dateRange)
+    const { data: campaignList = [], isLoading, isError, error } = useGetCampaignQuery();
 
     const filteredData = campaignList.filter((campaign) => campaign.name.toLowerCase().includes(searchText.toLowerCase())).filter((campaign) => {
         if (!dateRange) return true;
         const [startDate, endDate] = dateRange;
-        const campgainStartDate = dayjs(campaign.startDate, "DD/MM/YYYY")
-        const campgainEndDate = dayjs(campaign.endDate, "DD/MM/YYYY")
-
-        return (campgainStartDate.isAfter(startDate) || campgainStartDate.isSame(startDate)) && (campgainEndDate.isSame(endDate) || campgainEndDate.isBefore(endDate));
+        const campaignStartDate = dayjs(campaign.startDate, "DD/MM/YYYY")
+        const campaignEndDate = dayjs(campaign.endDate, "DD/MM/YYYY")
+        return (
+            campaignStartDate.isSameOrBefore(dayjs(endDate, "DD/MM/YYYY"), "day") &&
+            campaignEndDate.isSameOrAfter(dayjs(startDate, "DD/MM/YYYY"), "day")
+        );
     });
+
     return (
         <>
-
-            <Table<DataType>
-                columns={columns}
-                dataSource={filteredData}
-                rowKey={(record) => record.id.toString()}
-            />
+            {isError ? <div>Error fetching campaign data</div> :
+                <Table<Campaign>
+                    columns={columns}
+                    dataSource={filteredData}
+                    rowKey={(record) => record.id.toString()}
+                    loading={isLoading}
+                />
+            }
         </>
     )
 }
