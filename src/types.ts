@@ -7,3 +7,8 @@ export interface Campaign {
     budget: number;
     currency: string
 }
+
+export interface ICampaignFilterState {
+    searchText: string;
+    dateRange: [string | null, string | null] | null;
+}
