@@ -1,14 +1,11 @@
 import { Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import type { Campaign } from '../types';
 import { useAddCampaignMutation, useGetCampaignQuery } from '../store/apiSlice';
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { useEffect } from 'react';
+import dayjs from '../lib/dayjs';
 
 declare global {
     interface Window {
@@ -69,9 +66,6 @@ const columns: TableProps<Campaign>['columns'] = [
     },
 ]
 
-dayjs.extend(customParseFormat);
-dayjs.extend(isSameOrAfter);
-dayjs.extend(isSameOrBefore);
 function CampgainList() {
     const searchText = useSelector((state: RootState) => state.campaignFilter.searchText)
     const dateRange = useSelector((state: RootState) => state.campaignFilter.dateRange)
