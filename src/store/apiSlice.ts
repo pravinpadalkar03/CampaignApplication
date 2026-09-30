@@ -6,21 +6,23 @@ const baseUrl = "http://localhost:3000";
 export const api = createApi({
     reducerPath: 'campaign',
     baseQuery: fetchBaseQuery({ baseUrl }),
-
+    tagTypes: ['Campaign'],
     endpoints: (builder) => ({
         getCampaign: builder.query<Campaign[], void>({
-            query: () => '/campaigns'
+            query: () => '/campaigns',
+            providesTags: ['Campaign']
         }),
         addCampaign: builder.mutation<Campaign, IcreateCampaign>({
             query: (campaign) => ({
                 url: '/campaigns',
                 method: 'POST',
-                body: campaign
+                body: campaign,
+                invalidateTags: ['Campaign']
             })
+
 
         })
     })
-
 })
 
 export const { useGetCampaignQuery, useAddCampaignMutation } = api
