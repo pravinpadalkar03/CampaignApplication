@@ -1,6 +1,6 @@
 import { Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import type { Campaign } from '../types';
 import { useGetCampaignQuery } from '../store/apiSlice';
@@ -68,7 +68,7 @@ dayjs.extend(isSameOrBefore);
 function CampgainList() {
     const searchText = useSelector((state: RootState) => state.campaignFilter.searchText)
     const dateRange = useSelector((state: RootState) => state.campaignFilter.dateRange)
-    const { data: campaignList = [], isLoading, isError, error } = useGetCampaignQuery();
+    const { data: campaignList = [], isLoading, isError } = useGetCampaignQuery();
 
     const filteredData = campaignList.filter((campaign) => campaign.name.toLowerCase().includes(searchText.toLowerCase())).filter((campaign) => {
         if (!dateRange) return true;
