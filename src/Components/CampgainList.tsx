@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { useEffect } from 'react';
 import dayjs from '../lib/dayjs';
+import { filterCampaigns } from '../lib/filterCampaigns';
 
 declare global {
     interface Window {
@@ -72,16 +73,7 @@ function CampgainList() {
     const { data: campaignList = [], isLoading, isError } = useGetCampaignQuery();
     const [addCampaign, { isLoading: isPostingCampaigns }] = useAddCampaignMutation();
 
-    const filteredData = campaignList.filter((campaign) => campaign.name.toLowerCase().includes(searchText.toLowerCase())).filter((campaign) => {
-        if (!dateRange) return true;
-        const [startDate, endDate] = dateRange;
-        const campaignStartDate = dayjs(campaign.startDate, "DD/MM/YYYY")
-        const campaignEndDate = dayjs(campaign.endDate, "DD/MM/YYYY")
-        return (
-            campaignStartDate.isSameOrBefore(dayjs(endDate, "YYYY-MM-DD"), "day") &&
-            campaignEndDate.isSameOrAfter(dayjs(startDate, "YYYY-MM-DD"), "day")
-        );
-    });
+    const filteredData = filterCampaigns(campaignList, searchText, dateRange);
 
     const addCampaings = async (data: Campaign[]) => {
         await Promise.all(data.map((campaign) =>
@@ -107,7 +99,5 @@ function CampgainList() {
 }
 
 export default CampgainList
-
-
 
 
