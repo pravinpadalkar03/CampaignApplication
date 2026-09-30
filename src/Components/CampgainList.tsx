@@ -1,13 +1,17 @@
 import { Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import type { Campaign } from '../types';
-import { useGetCampaignQuery } from '../store/apiSlice';
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { useAddCampaignMutation, useGetCampaignQuery } from '../store/apiSlice';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
+import { useEffect } from 'react';
+import dayjs from '../lib/dayjs';
+
+declare global {
+    interface Window {
+        addCampaigns: (campaigns: Campaign[]) => void;
+    }
+}
 const columns: TableProps<Campaign>['columns'] = [
     {
         title: 'ID',
@@ -62,13 +66,11 @@ const columns: TableProps<Campaign>['columns'] = [
     },
 ]
 
-dayjs.extend(customParseFormat);
-dayjs.extend(isSameOrAfter);
-dayjs.extend(isSameOrBefore);
 function CampgainList() {
     const searchText = useSelector((state: RootState) => state.campaignFilter.searchText)
     const dateRange = useSelector((state: RootState) => state.campaignFilter.dateRange)
     const { data: campaignList = [], isLoading, isError } = useGetCampaignQuery();
+    const [addCampaign, { isLoading: isPostingCampaigns }] = useAddCampaignMutation();
 
     const filteredData = campaignList.filter((campaign) => campaign.name.toLowerCase().includes(searchText.toLowerCase())).filter((campaign) => {
         if (!dateRange) return true;
@@ -81,8 +83,17 @@ function CampgainList() {
         );
     });
 
+    const addCampaings = async (data: Campaign[]) => {
+        await Promise.all(data.map((campaign) =>
+            addCampaign(campaign).unwrap()
+        ))
+    }
+    useEffect(() => {
+        window.addCampaigns = addCampaings
+    }, [])
     return (
         <>
+            {isPostingCampaigns && <div>Adding campaigns...</div>}
             {isError ? <div>Error fetching campaign data</div> :
                 <Table<Campaign>
                     columns={columns}
