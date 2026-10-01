@@ -30,6 +30,7 @@ const columns: TableProps<Campaign>['columns'] = [
         title: 'User Name',
         dataIndex: 'username',
         key: 'username',
+        render: (text) => <a>{text ? text : 'Unknown User'}</a>,
     },
     {
         title: 'Start Date',
