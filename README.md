@@ -74,3 +74,11 @@ export default defineConfig([
 
 ```
 # CampaignApplication
+
+## Tests
+
+Run the campaign filter and Redux state tests with:
+
+```sh
+npm test
+```
