@@ -16,7 +16,14 @@ function CampaignFilters() {
 
     return (
         <div className='flex justify-between items-center my-8'>
-            <RangePicker placement='bottomLeft' onChange={handleDateRangeChange} />
+            <RangePicker placement='bottomLeft' onChange={handleDateRangeChange}
+                disabledDate={(current, info) => {
+                    if (!info.from) {
+                        return false;
+                    }
+
+                    return current.isBefore(info.from, 'day');
+                }} />
             <Search style={{ width: '300px' }} size="medium" placeholder="Search By Name" onChange={(e) => dispatch(setSearchText(e.target.value))} allowClear />
         </div>
     )
