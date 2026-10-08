@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { campaignFilterReducer, setDateRange, setSearchText } from './campaignFilterSlice';
+import { campaignFilterReducer, setDateRange, setSearchText } from '../store/campaignFilterSlice';
 
 describe('campaignFilterReducer', () => {
     it('starts with an empty search and no date range', () => {
